@@ -1,0 +1,10 @@
+"C:\Program Files\JetBrains\CLion 2022.2.1\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" -S "C:\Users\Mads Vind Knudsen\Documents\GitHub\Sudoku-Program" -B "C:\Users\Mads Vind Knudsen\Documents\GitHub\Sudoku-Program\cmake-build-debug"
+-- The C compiler identification is GNU 11.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/JetBrains/CLion 2022.2.1/bin/mingw/bin/gcc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/Users/Mads Vind Knudsen/Documents/GitHub/Sudoku-Program/cmake-build-debug
