@@ -4,6 +4,8 @@
 #define BOARD_SIZE 9
 #define MULIGE_INTS 10
 
+void menu();
+
 int *** make3dArray();
 
 int *** makeBoardFromFile(char* file);
@@ -23,22 +25,42 @@ void printTable(int*** pBoard);
 void free3DpArray(int ***pBoard);
 
 int main() {
-    /*printf("Write the name of the file with the Sudoku board (max of 20 chars)\n =>");
-    char pFileName[20];
-
-    scanf("%s", &pfileName);
-
-    int *** standardBoard = makeBoardFromFile(pFileName);
-    */
-
-    int *** standardBoard = uiTable();
-    createSudokuFile(standardBoard);
-
-
-
-    printTable(solveTable(standardBoard));
-    free3DpArray(standardBoard);
+    menu();
     return 0;
+}
+
+void menu() {
+    char * s, serror;
+    int option, exit = 0;
+    do {
+        printf("\nMenu: \n1: Input board and solve\n2: Input board to file\n3: Solve board from file\n4: Exit\n => ");
+        scanf("%d", &option);
+        printf("\n");
+        switch (option) {
+            int ***board;
+            case 1:
+                board = uiTable();
+                solveTable(board);
+                free3DpArray(board);
+                break;
+            case 2:
+                board = uiTable();
+                createSudokuFile(board);
+                free3DpArray(board);
+                break;
+            case 3:
+                printf("Write the name of the file with the Sudoku board (max of 20 chars)\n =>");
+                char pFileName[20];
+                scanf("%s", &pFileName);
+                board = makeBoardFromFile(pFileName);
+                solveTable(board);
+                free3DpArray(board);
+                break;
+            case 4:
+                exit = 1;
+                break;
+        }
+    } while((option > 5 && 0 > option) || exit != 1);
 }
 
 int *** make3dArray() {
@@ -58,7 +80,7 @@ int *** make3dArray() {
 int *** makeBoardFromFile(char* file) {
     int*** pBoard = make3dArray();                                  //makes pointer array in the size of a sudoku board
     FILE * pFile;                                                   //makes a pointer to a file
-    printf("file with the name %s", file);
+    printf("\nfile with the name %s:", file);
     pFile = fopen(file, "r");                          //locates the file for the above pointer and says it's for reading
     signed char c;                                                  //c represents one char in the file
 
@@ -174,6 +196,7 @@ int *** solveTable(int*** pBoard) {
             }
         }
     } while ((zeroCounter != 0) && (lastZeroCount != zeroCounter));
+    printTable(pBoard);
     return pBoard;
 }
 
