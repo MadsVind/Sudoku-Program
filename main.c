@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "vrble.c"
 
 #define BOARD_SIZE 9
 #define MULIGE_INTS 10
 
 void menu();
-
-int *** make3dArray();
 
 int *** makeBoardFromFile(char* file);
 
@@ -29,6 +29,10 @@ int main() {
     return 0;
 }
 
+
+/*
+ * Menu of the entire program interacted with through the console.
+ */
 void menu() {
     char * s, serror;
     int option, exit = 0;
@@ -52,9 +56,12 @@ void menu() {
                 printf("Write the name of the file with the Sudoku board (max of 20 chars)\n =>");
                 char pFileName[20];
                 scanf("%s", &pFileName);
-                board = makeBoardFromFile(pFileName);
+                char * pFileTxt = strcat(pFileName, ".txt");
+                printf("\n %s", pFileTxt);
+                board = makeBoardFromFile(pFileTxt);
                 solveTable(board);
                 free3DpArray(board);
+                free(pFileTxt);
                 break;
             case 4:
                 exit = 1;
@@ -63,41 +70,31 @@ void menu() {
     } while((option > 5 && 0 > option) || exit != 1);
 }
 
-int *** make3dArray() {
-    int*** pBoard = malloc(sizeof(int**) * BOARD_SIZE);
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        pBoard[i] = malloc(sizeof(int*) * BOARD_SIZE);
-        for (int j = 0; j < BOARD_SIZE; j++) {
-            pBoard[i][j] = malloc(sizeof(int) * MULIGE_INTS);
-        }
-    }
-    return pBoard;
-}
 /*
  * Reads from file with a sudoku board to make a 4D pointer array with the sudoku boards numbers in the 0 position in
  * fourth layer by going through 2 for loops.
  * */
 int *** makeBoardFromFile(char* file) {
-    int*** pBoard = make3dArray();                                  //makes pointer array in the size of a sudoku board
-    FILE * pFile;                                                   //makes a pointer to a file
+    int*** pBoard = p3DArray(BOARD_SIZE, BOARD_SIZE, MULIGE_INTS);  //makes pointer array in the size of a sudoku board
+    FILE * pFile;                                                                    //makes a pointer to a file
     printf("\nfile with the name %s:", file);
-    pFile = fopen(file, "r");                          //locates the file for the above pointer and says it's for reading
-    signed char c;                                                  //c represents one char in the file
+    pFile = fopen(file, "r");                                           //locates the file for the above pointer and says it's for reading
+    signed char c;                                                                   //c represents one char in the file
 
-    if (pFile == NULL) {                                            //check if there is anything at the address of the pointer (the file)
-        printf("There was no file with the name %s", file);   // if it is not the case it informs the user
-        return pBoard;                                              // and then return to the call
+    if (pFile == NULL) {                                                             //check if there is anything at the address of the pointer (the file)
+        printf("There was no file with the name %s", file);                    // if it is not the case it informs the user
+        return pBoard;                                                               // and then return to the call
     }
-    else {                                                          //If it's not the case it starts to take what is in the-
-        int i = 0, j = 0;                                           //file and tries to put it in the pointer array of a board
-        while ((c = fgetc(pFile)) != EOF) {                     //gets a char and put it in c from the file as long as the end hasn't been reached
-            if (c != ' ' && c != '\n') {                            //makes sure c is actually a character
-                pBoard[i][j][0] = c - '0';                          //converts char to int, something about ascii and  negating by 0
+    else {                                                                           //If it's not the case it starts to take what is in the-
+        int i = 0, j = 0;                                                            //file and tries to put it in the pointer array of a board
+        while ((c = fgetc(pFile)) != EOF) {                                      //gets a char and put it in c from the file as long as the end hasn't been reached
+            if (c != ' ' && c != '\n') {                                             //makes sure c is actually a character
+                pBoard[i][j][0] = c - '0';                                           //converts char to int, something about ascii and  negating by 0
                 i++;
-                if (i == 9) {                                       //next line is reached on the board
+                if (i == 9) {                                                        //next line is reached on the board
                     i = 0;
                     j++;
-                    if (j == 9) {                                   //last line of the board has been reached
+                    if (j == 9) {                                                    //last line of the board has been reached
                         break;
                     }
                 }
@@ -112,7 +109,7 @@ int *** makeBoardFromFile(char* file) {
  * Makes sudoku board in 4D pointer array from user input by 2 for loops.
  */
 int *** uiTable() {
-    int *** pBoard = make3dArray();
+    int *** pBoard = p3DArray(BOARD_SIZE, BOARD_SIZE, MULIGE_INTS);
     for (int i = 0; i < BOARD_SIZE; i++) {
         for (int j = 0; j < BOARD_SIZE; j++) {
             int ui = 0;
@@ -129,12 +126,18 @@ int *** uiTable() {
     return pBoard;
 }
 
+/*
+ * Takes an 4D pointer array with a sudoku board in it and prints it to a txt file.
+ */
 void createSudokuFile(int*** pBoard) {
-    char fileName[20];
+    const int charsSize = 20;
+    char pFileName[charsSize];
     printf("Name the file for the Sudoku board (max 20 chars) \n => ");
-    scanf("%s", &fileName);
+    scanf("%s", &pFileName);
+    char * pFileTxt = strcat(pFileName, ".txt");
+    free(pFileName);
     FILE * pFile;
-    pFile = fopen(fileName, "w+");
+    pFile = fopen(pFileTxt, "w+");
 
     char sudokuString[400];
 
@@ -152,8 +155,12 @@ void createSudokuFile(int*** pBoard) {
     }
     fputs(sudokuString, pFile);
     fclose(pFile);
+    free(pFileTxt);
 }
 
+/*
+ * prints the first int of the last pointer array in the shape of a sudoku table
+ */
 void printTable(int*** pBoard) {
     printf("\n");
     for (int i = 0; i < BOARD_SIZE; i++) {
