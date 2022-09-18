@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
 #include "vrble.c"
 
 #define BOARD_SIZE 9
@@ -11,6 +12,10 @@ void menu();
 int *** makeBoardFromFile(char* file);
 
 int *** uiTable();
+
+void printFolder(char * path);
+
+int checkIfInFolder(char * pFileName, char * path);
 
 void createSudokuFile(int*** pBoard);
 
@@ -37,11 +42,13 @@ void menu() {
     char * s, serror;
     int option, exit = 0;
     do {
-        printf("\nMenu: \n1: Input board and solve\n2: Input board to file\n3: Solve board from file\n4: Exit\n => ");
-        scanf("%d", &option);
+        option = 0;
+        printf("\nMenu: \n1: Input board and solve\n2: Input board to file\n3: Solve board from file\n4: Exit");
+        option = scanInt();
         printf("\n");
         switch (option) {
             int ***board;
+            char *path;
             case 1:
                 board = uiTable();
                 solveTable(board);
@@ -53,15 +60,22 @@ void menu() {
                 free3DpArray(board);
                 break;
             case 3:
-                printf("Write the name of the file with the Sudoku board (max of 20 chars)\n =>");
-                char pFileName[20];
-                scanf("%s", &pFileName);
-                char * pFileTxt = strcat(pFileName, ".txt");
-                printf("\n %s", pFileTxt);
+                path = "SudokuBoards/";
+                printFolder(path);
+                char pFileName[100];
+                do {
+                    printf("\n\nWrite the name of the file with the Sudoku board\nEnter String: ");
+                    scanf("%s", &pFileName);
+                    strcat(pFileName, ".txt");
+                } while (!checkIfInFolder(pFileName, path));
+
+                char pFileTxt[100];
+                strcat(pFileTxt, "SudokuBoards/");
+                strcat(pFileTxt, pFileName);
+
                 board = makeBoardFromFile(pFileTxt);
                 solveTable(board);
                 free3DpArray(board);
-                free(pFileTxt);
                 break;
             case 4:
                 exit = 1;
@@ -112,30 +126,62 @@ int *** uiTable() {
     int *** pBoard = p3DArray(BOARD_SIZE, BOARD_SIZE, MULIGE_INTS);
     for (int i = 0; i < BOARD_SIZE; i++) {
         for (int j = 0; j < BOARD_SIZE; j++) {
-            int ui = 0;
-            printf("%d, %d: ", i, j);
-            scanf( "%d", &ui);
+            int ui = -1;
+            do {
+                printf("\nsquare: %d, %d ", i, j);
+                ui = scanInt();
+            } while (ui < 0 || ui > 9);
             pBoard[i][j][0] = ui;
-            while (ui < 0 || ui >= 10) {
-                printf("Error 400, try again: %d, %d: ", i, j);
-                scanf( "%d", &ui);
-                pBoard[i][j][0] = ui;
-            }
         }
     }
     return pBoard;
+}
+
+void printFolder(char * path) {
+    struct dirent * pEntry;
+    DIR * folder = opendir(path);
+    if (folder == NULL) {
+        printf("Folder Error");
+        return;
+    }
+    printf("\nFiles in folder:");
+    while ((pEntry = readdir(folder)) != NULL) {
+        printf("\n%s", pEntry->d_name);
+    }
+    closedir(folder);
+}
+
+int checkIfInFolder(char * pFileName, char * path) {
+    int bool = 0;
+    struct dirent * pEntry;
+    DIR * folder = opendir(path);
+    if (folder == NULL) {
+        printf("Folder Error");
+        return 0;
+    }
+    while ((pEntry = readdir(folder)) != NULL) {
+        if (strcmp(pEntry->d_name, pFileName) == 0) {
+            bool = 1;
+            printf("%d",bool);
+        }
+    }
+    return bool;
 }
 
 /*
  * Takes an 4D pointer array with a sudoku board in it and prints it to a txt file.
  */
 void createSudokuFile(int*** pBoard) {
-    const int charsSize = 20;
+    const int charsSize = 100;
     char pFileName[charsSize];
-    printf("Name the file for the Sudoku board (max 20 chars) \n => ");
+    printf("Name the file for the Sudoku board \nEnter String:  ");
     scanf("%s", &pFileName);
-    char * pFileTxt = strcat(pFileName, ".txt");
-    free(pFileName);
+
+    char pFileTxt[100];
+    strcat(pFileName, ".txt");
+    strcat(pFileTxt, "SudokuBoards/");
+    strcat(pFileTxt, pFileName);
+
     FILE * pFile;
     pFile = fopen(pFileTxt, "w+");
 
@@ -155,7 +201,6 @@ void createSudokuFile(int*** pBoard) {
     }
     fputs(sudokuString, pFile);
     fclose(pFile);
-    free(pFileTxt);
 }
 
 /*
@@ -206,7 +251,6 @@ int *** solveTable(int*** pBoard) {
     printTable(pBoard);
     return pBoard;
 }
-
 
 
 int * possibilities(int*** pBoard, int i, int j) {
