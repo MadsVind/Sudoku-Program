@@ -25,4 +25,5 @@ CMakeFiles/Sudoku-Program.dir/main.c.obj: \
  C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/x86_64-w64-mingw32/include/sec_api/string_s.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/x86_64-w64-mingw32/include/dirent.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.1/bin/mingw/x86_64-w64-mingw32/include/io.h \
- C:\Users\Mads\ Vind\ Knudsen\Documents\GitHub\Sudoku-Program\vrble.c
+ C:\Users\Mads\ Vind\ Knudsen\Documents\GitHub\Sudoku-Program\scan.c \
+ C:\Users\Mads\ Vind\ Knudsen\Documents\GitHub\Sudoku-Program\array.c
